@@ -5,7 +5,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 const app = express();
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
 import { connectMongoDB } from "./src/config/dbConfig.js";
 connectMongoDB();
@@ -17,10 +17,14 @@ app.use(cors());
 import taskRouter from "./src/routers/taskRouter.js";
 app.use("/api/v1/tasks", taskRouter);
 
-app.get("/", (req, res) => {
-  res.json({
-    message: "You have reached the not to do api server",
-  });
+//serving static content
+import path from "path";
+const __dirname = path.resolve();
+
+app.use(express.static(path.resolve(__dirname, "./client/build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "./client/build", "index.html"));
 });
 
 app.listen(PORT, (error) => {
